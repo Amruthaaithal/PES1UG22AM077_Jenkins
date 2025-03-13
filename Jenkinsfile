@@ -1,33 +1,47 @@
-pipeline{
-  agent any
-  stages{
-    stage('Build'){
-      steps{
-        sh 'mvn clean install'
-        echo 'Build stage successful'
-      }
-    }
-    stage('Test'){
-      steps{
-        sh 'mvn test'
-        echo 'Test stage successful'
-        post{
-          always{
-            junit 'target/surefire-report/*.xml'
-          }
+pipeline {
+    agent any
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                script {
+                    echo 'Cloning repository...'
+                    checkout scm
+                }
+            }
         }
-      }
+        
+        stage('Build') {
+            steps {
+                script {
+                    echo 'Building the project...'
+                    sh 'g++ -o PES1UG22AM077-1 task5.cpp'  // Compile with SRN-based name
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                script {
+                    echo 'Running tests...'
+                    sh './PES1UG22AM077-1'  // Print output of compiled file
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    echo 'Deploying application...'
+                }
+            }
+        }
+        
     }
-    stage('Deploy'){
-      steps{
-        sh 'mvn deploy'
-        echo 'Deployment successful'
-      }
+    
+    post {
+        failure {
+            echo 'Pipeline failed'
+        }
     }
-  }
-  post{
-    failure{
-      echo 'Pipeline failed'
-    }
-  }
 }
